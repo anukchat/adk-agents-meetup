@@ -5,4 +5,7 @@ description = "Backend for ADK Agents Meetup"
 dependencies = [
 	"requests",
 	"streamlit",
+	"google-adk",
+	"litellm"
 ]
+requires-python = ">=3.12"
