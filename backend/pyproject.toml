@@ -6,6 +6,7 @@ dependencies = [
 	"requests",
 	"streamlit",
 	"google-adk",
-	"litellm"
+	"litellm",
+	"beautifulsoup4",
 ]
 requires-python = ">=3.12"
