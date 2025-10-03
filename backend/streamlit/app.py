@@ -209,8 +209,10 @@ elif app_tab == "Workflow Execution Demo":
                 st.markdown("### 🎯 Step 2: Match Against Open Requirements")
                 if result["matched"]:
                     st.success(f"✅ Match Found → {result['matched_role']}")
+                    st.info(f"**Match Reasoning:** {result['reasoning']}")
                 else:
-                    st.error("❌ No Match Found")
+                    st.success(f"✅ Closest Match Found → {result['matched_role']}")
+                    st.info(f"**Match Reasoning:** {result['reasoning']}")
 
                 # Step 3: Email drafting (only if matched)
                 st.markdown("### 📧 Step 3: Email to Hiring Manager")

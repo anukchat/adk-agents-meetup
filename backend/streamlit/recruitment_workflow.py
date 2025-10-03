@@ -1,3 +1,4 @@
+import re
 from src.utils.llm import call_llm
 
 def classify_domain(cv_text: str) -> str:
@@ -6,7 +7,7 @@ def classify_domain(cv_text: str) -> str:
         {"role": "system", "content": (
             "You are an expert recruiter. "
             "Read the CV and classify the **main technology/domain** into one label "
-            "(e.g., Python, Data Science, Frontend, Backend, Cloud, DevOps, etc.). "
+            "(e.g., Python, Data Science, Frontend, Backend, Cloud, DevOps, HR, Project Manager, Business Analyst, Business Development, Marketing, Sales, Finance, Legal, etc.). "
             "Respond with only the label."
         )},
         {"role": "user", "content": cv_text}
@@ -27,24 +28,30 @@ def match_requirements(domain: str, open_requirements=None) -> tuple[bool, str]:
         {"role": "system", "content": (
             "You are a recruitment assistant. "
             "Check if the given candidate domain matches one of the open requirements. "
-            "If yes, respond with the matched requirement. If not, respond with 'No Match'."
+            "If yes, respond with the matched requirement inside <matched_role> tags. If not, respond with <matched_role>No match</matched_role> and provide the closest match inside <closest_match> tags. Provide the reasoning for the match or closest match inside <reasoning> tags."
         )},
         {"role": "user", "content": f"Candidate domain: {domain}\nOpen roles: {', '.join(open_requirements)}"}
     ]
     response = call_llm(prompt)
     result = response.choices[0].message.content.strip()
 
-    if result.lower() == "no match":
-        return False, None
+    matched_role =re.search(r"<matched_role>(.*?)</matched_role>", result)
+    closest_match =re.search(r"<closest_match>(.*?)</closest_match>", result)
+    reasoning =re.search(r"<reasoning>(.*?)</reasoning>", result)
+    
+    print(result)
+    if matched_role and matched_role.group(1).lower() != "no match":
+        return True, matched_role.group(1), reasoning.group(1)
+    elif closest_match:
+        return False, closest_match.group(1), reasoning.group(1)
     else:
-        return True, result
+        return False, "No match", "No Match"
 
-def write_email(cv_text: str, domain: str, role: str) -> str:
+def write_email(cv_text: str, domain: str, matched_role: str, reasoning: str) -> str:
     """Ask LLM to draft a short recruiter email."""
     prompt = [
         {"role": "system", "content": (
-            "Write a short, professional email to the hiring manager recommending this CV "
-            f"for the {role} role. Be polite and concise (3-4 sentences)."
+            f"Write a short, professional email to the hiring manager recommending this CV who has domain: {domain} and has matched role: {matched_role} against open requirements, the match reasoning provided from the Matcher is: {reasoning}. Be polite and concise (3-4 sentences)."
         )},
         {"role": "user", "content": cv_text}
     ]
@@ -66,12 +73,13 @@ def recruitment_workflow(cv_text: str) -> dict:
     steps["domain"] = domain
 
     # Step 2: check match
-    matched, matched_role = match_requirements(domain)
+    matched, matched_role, reasoning = match_requirements(domain)
     steps["matched"] = matched
     steps["matched_role"] = matched_role
+    steps["reasoning"] = reasoning
 
     # Step 3: email draft
-    email = write_email(cv_text, domain, matched_role) if matched else None
+    email = write_email(cv_text, domain, matched_role, reasoning)
     steps["email"] = email
     
     email_address = "hiring-manager@example.com"
