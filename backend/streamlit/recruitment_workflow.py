@@ -20,7 +20,7 @@ def match_requirements(domain: str, open_requirements=None) -> tuple[bool, str]:
     Returns (matched, matched_role).
     """
     open_requirements = open_requirements or [
-        "Python Developer", "Data Scientist", "Frontend Engineer", "Backend Engineer", "Cloud Engineer", "HR Manager"
+        "Python Developer", "Data Scientist", "Frontend Engineer", "Backend Engineer", "Cloud Engineer", "HR Manager,  Project Manager, Business Analyst"
     ]
 
     prompt = [
@@ -51,6 +51,12 @@ def write_email(cv_text: str, domain: str, role: str) -> str:
     response = call_llm(prompt)
     return response.choices[0].message.content.strip()
 
+def send_email(email_address: str, email_text: str) -> str:
+    """Send Email to Hiring Manager"""
+    # send email to email_address with email_text
+    print(f"Sending email to {email_address} with text: {email_text}")
+    return "Email sent successfully"
+
 def recruitment_workflow(cv_text: str) -> dict:
     """Run the recruitment workflow step by step with real LLM calls."""
     steps = {}
@@ -67,5 +73,10 @@ def recruitment_workflow(cv_text: str) -> dict:
     # Step 3: email draft
     email = write_email(cv_text, domain, matched_role) if matched else None
     steps["email"] = email
+    
+    email_address = "hiring-manager@example.com"
+    # Step 4: send email
+    send_email(email_address, email)
+    steps["email_sent"] = True
 
     return steps

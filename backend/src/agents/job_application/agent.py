@@ -7,9 +7,7 @@ load_dotenv()
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
 
 from google.adk.models.lite_llm import LiteLlm  # For multi-model support
-from google.adk.tools import google_search, load_memory
 from google.adk.tools.agent_tool import AgentTool
-from google.adk.tools.preload_memory_tool import PreloadMemoryTool
 from google.adk.code_executors import BuiltInCodeExecutor
 from google.adk.tools.mcp_tool.mcp_toolset import (
     MCPToolset,
@@ -18,7 +16,6 @@ from google.adk.tools.mcp_tool.mcp_toolset import (
 )
 from google.adk.agents import LlmAgent
 from google.adk.planners import PlanReActPlanner
-from src.agents.deep_research.agent import grounding_callback
 from src.agents.job_application.models import CVScreenerOutput
 from src.agents.job_application.prompts import JOB_DISCOVERY_PROMPT, SCORER_PROMPT, CV_SCREENER_PROMPT
 from src.tools.file_tools import get_file_tools

@@ -11,7 +11,7 @@ load_dotenv()
 SERPER_API_KEY = os.getenv("SERPER_API_KEY")
 SERPER_BASE_URL = os.getenv("SERPER_BASE_URL", "https://google.serper.dev/search")
 
-def serper_search(query: str) -> dict:
+def serper_search(query: str):
     """
     Perform a web search using the SERPER API.
     Args:
@@ -28,7 +28,9 @@ def serper_search(query: str) -> dict:
     return response.json()
 
 def get_serper_tools():
-    """Return serper search tools in the expected format."""
+    """
+    Returns a list of SERPER search tools.
+    """
     return [serper_search]
 
 if __name__ == "__main__":
